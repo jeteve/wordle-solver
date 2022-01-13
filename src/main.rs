@@ -9,7 +9,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Loading {} dictionary", fname);
     let assets_cache = AssetCache::new("assets")?;
     let words = wordle_solver::load_words(&assets_cache, fname)?;
-    println!("Loaded {} words", words.len());
+    println!("Loaded {} 5 letter words", words.len());
 
     // main program loop
     // output best guess, get feedback, repeat
