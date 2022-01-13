@@ -38,10 +38,12 @@ fn solver_hints() {
         String::from("clock"),
         String::from("coach"),
         String::from("court"),
+        String::from("carte"),
     ]
     .into_iter()
     .collect();
     let mut solver = Solver::new(&words);
+    solver.discard_word("carte");
     assert_eq!(solver.n_candidates(), 4);
     solver.add_hint(&'o', &5, Hint::Exists);
     assert_eq!(solver.n_candidates(), 3);

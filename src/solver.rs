@@ -69,8 +69,11 @@ impl Solver {
             Hint::Invalid => self.add_invalid(l),
         }
     }
+    pub fn discard_word(&mut self,s: &str){
+        self.candidates.remove(s);
+    }
 
-    pub fn add_well_placed(&mut self, l: &char, p: &usize) {
+    fn add_well_placed(&mut self, l: &char, p: &usize) {
         self.well_placed.push((*l, *p));
         // Well place means we need to include only in candidate
         // those with the letter in the right place.
@@ -81,7 +84,7 @@ impl Solver {
             .collect()
     }
 
-    pub fn add_exists(&mut self, l: &char, p: &usize) {
+    fn add_exists(&mut self, l: &char, p: &usize) {
         self.exists.push((*l, *p));
         // Intersect with the word who just have the character
         let mut new_candidates: HashSet<String> = self
@@ -97,7 +100,7 @@ impl Solver {
         self.candidates = new_candidates;
     }
 
-    pub fn add_invalid(&mut self, l: &char) {
+    fn add_invalid(&mut self, l: &char) {
         self.invalid.push(*l);
         // Character is invalid. simply remove all the words containing it
         let to_remove = self.with_letter(l).clone();
