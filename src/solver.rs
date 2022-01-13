@@ -64,11 +64,48 @@ impl Solver {
     }
     pub fn add_hint(&mut self, l: &char, p: &usize, h: Hint) {
         match h {
-            Hint::WellPlaced => self.well_placed.push((*l, *p)),
-            Hint::Exists => self.exists.push((*l, *p)),
-            Hint::Invalid => self.invalid.push(*l),
+            Hint::WellPlaced => self.add_well_placed(l, p),
+            Hint::Exists => self.add_exists(l, p),
+            Hint::Invalid => self.add_invalid(l),
         }
     }
+
+    pub fn add_well_placed(&mut self, l: &char, p: &usize) {
+        self.well_placed.push((*l, *p));
+        // Well place means we need to include only in candidate
+        // those with the letter in the right place.
+        self.candidates = self
+            .candidates
+            .intersection(self.with_letter_in_position(l, p))
+            .map(|s| s.clone())
+            .collect()
+    }
+
+    pub fn add_exists(&mut self, l: &char, p: &usize) {
+        self.exists.push((*l, *p));
+        // Intersect with the word who just have the character
+        let mut new_candidates: HashSet<String> = self
+            .candidates
+            .intersection(self.with_letter(l))
+            .map(|s| s.clone())
+            .collect();
+        // And REMOVE the words that have this letter in this position
+        // if it was well placed, add_well_placed would be called instead.
+        let to_remove = self.with_letter_in_position(l, p);
+        new_candidates.retain(|s| !to_remove.contains(s));
+
+        self.candidates = new_candidates;
+    }
+
+    pub fn add_invalid(&mut self, l: &char) {
+        self.invalid.push(*l);
+        // Character is invalid. simply remove all the words containing it
+        let to_remove = self.with_letter(l).clone();
+        self.candidates.retain(|s| !to_remove.contains(s));
+    }
+
+    // kept for reference. Remove when it all works.
+    #[deprecated]
     pub fn refresh_candidates(&mut self) {
         // intersect of all the well placed ones from by_letter_position
         // and all the exists ones from by_letter

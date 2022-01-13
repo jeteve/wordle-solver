@@ -44,15 +44,12 @@ fn solver_hints() {
     let mut solver = Solver::new(&words);
     assert_eq!(solver.n_candidates(), 4);
     solver.add_hint(&'o', &5, Hint::Exists);
-    solver.refresh_candidates();
     assert_eq!(solver.n_candidates(), 3);
 
     solver.add_hint(&'l', &1, Hint::WellPlaced);
-    solver.refresh_candidates();
     assert_eq!(solver.n_candidates(), 1);
 
     // The position does not really matter for an invalid hint
     solver.add_hint(&'s', &0, Hint::Invalid);
-    solver.refresh_candidates();
     assert_eq!(solver.n_candidates(), 1);
 }
