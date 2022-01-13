@@ -1,3 +1,5 @@
+pub mod solver;
+
 use assets_manager::{
     loader::{LoadFrom, StringLoader},
     Asset, AssetCache,
@@ -8,7 +10,7 @@ use std::collections::HashSet;
 use std::error::Error;
 
 lazy_static! {
-    static ref FIVECHARS: Regex = Regex::new("[[:alpha:]]{5}").unwrap();
+    static ref FIVECHARS: Regex = Regex::new(r"^[[:alpha:]]{5}$").unwrap();
 }
 
 // The wrapper around the whole string dictionary, with a From trait

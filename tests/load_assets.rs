@@ -7,5 +7,5 @@ fn load_asset() {
     assert!(cache.is_ok());
     let words = load_words(&cache.unwrap(), "american-english");
     assert!(words.is_ok());
-    assert_eq!(words.unwrap().len(), 93845);
+    assert_eq!(words.unwrap().len(), 5905);
 }
