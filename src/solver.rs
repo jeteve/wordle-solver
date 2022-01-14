@@ -56,14 +56,14 @@ impl Solver {
         let candidates = all_words.clone();
         let by_letter = candidates.iter().fold(HashMap::new(), |mut h, v| {
             for c in v.chars() {
-                let entry = h.entry(c).or_insert(HashSet::new());
+                let entry = h.entry(c).or_insert_with(HashSet::new);
                 entry.insert(v.clone());
             }
             h
         });
         let by_letter_position = candidates.iter().fold(HashMap::new(), |mut h, v| {
             for (p, c) in v.chars().enumerate() {
-                let entry = h.entry((c, p)).or_insert(HashSet::new());
+                let entry = h.entry((c, p)).or_insert_with(HashSet::new);
                 entry.insert(v.clone());
             }
             h
