@@ -29,12 +29,12 @@ pub enum Hint {
 }
 
 #[derive(Debug)]
-pub struct HintParseError {
-    code: String,
+pub enum HintParseError {
+    InvalidCode(String)
 }
 impl fmt::Display for HintParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Invalid Hint Code '{}'", self.code)
+        write!(f, "Cannot parse hint '{:?}'", self)
     }
 }
 impl error::Error for HintParseError {}
@@ -46,9 +46,7 @@ impl std::str::FromStr for Hint {
             "x" => Ok(Hint::Invalid),
             "e" => Ok(Hint::Exists),
             "g" => Ok(Hint::WellPlaced),
-            _ => Err(HintParseError {
-                code: String::from(s),
-            }),
+            _ => Err(HintParseError::InvalidCode(s.to_string())),
         }
     }
 }

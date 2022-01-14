@@ -52,8 +52,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                     Ok(FullHint { c: candidate_char, p: i, hint })
                     //solver.add_hint(&candidate_char,&i,hint);
                 })
-                .map(|r: Result<FullHint, Box<dyn Error>>| r.unwrap())
-                .collect();
+                //.map(|r: Result<FullHint, Box<dyn Error>>| r.unwrap())
+                .collect::<Result<Vec<FullHint>,Box<dyn Error>>>()?;
 
             solver.ingest_hints(full_hints);
         }
