@@ -119,7 +119,7 @@ impl Solver {
     }
 
     fn add_well_placed(&mut self, l: &char, p: &usize) {
-        println!("Restricting to words containing an {} at position {}" , l, p);
+        //println!("Restricting to words containing an {} at position {}" , l, p);
         let to_retain = self.with_letter_in_position(l, p).clone();
         self.candidates.retain(|s| to_retain.contains(s));
         self.exists_letters.insert(*l);
