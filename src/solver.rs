@@ -1,22 +1,56 @@
 use lazy_static::lazy_static;
 use std::collections::{HashMap, HashSet};
+use std::error;
+use std::fmt;
 
 lazy_static! {
     static ref EMPTYSET: HashSet<String> = HashSet::new();
 }
+
 pub struct Solver {
     candidates: HashSet<String>,
-    well_placed: Vec<(char, usize)>,
-    exists: Vec<(char, usize)>,
-    invalid: Vec<char>,
+    exists_letters: HashSet<char>,
     by_letter: HashMap<char, HashSet<String>>,
     by_letter_position: HashMap<(char, usize), HashSet<String>>,
 }
 
+#[derive(Clone)]
+pub struct FullHint {
+    pub hint: Hint,
+    pub c: char,
+    pub p: usize,
+}
+
+#[derive(Clone, PartialEq)]
 pub enum Hint {
     WellPlaced,
     Exists,
     Invalid,
+}
+
+#[derive(Debug)]
+pub struct HintParseError {
+    code: String,
+}
+impl fmt::Display for HintParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Invalid Hint Code '{}'", self.code)
+    }
+}
+impl error::Error for HintParseError {}
+
+impl std::str::FromStr for Hint {
+    type Err = HintParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "x" => Ok(Hint::Invalid),
+            "e" => Ok(Hint::Exists),
+            "g" => Ok(Hint::WellPlaced),
+            _ => Err(HintParseError {
+                code: String::from(s),
+            }),
+        }
+    }
 }
 
 impl Solver {
@@ -36,14 +70,10 @@ impl Solver {
             }
             h
         });
-        let well_placed = Vec::new();
-        let exists = Vec::new();
-        let invalid = Vec::new();
+        let exists_letters = HashSet::new();
         Solver {
             candidates,
-            well_placed,
-            exists,
-            invalid,
+            exists_letters,
             by_letter,
             by_letter_position,
         }
@@ -62,6 +92,23 @@ impl Solver {
     pub fn with_letter_in_position(&self, l: &char, p: &usize) -> &HashSet<String> {
         self.by_letter_position.get(&(*l, *p)).unwrap_or(&EMPTYSET)
     }
+
+    // Ingest a bunch of hints together,
+    // ensuring logical consistency between them.
+    pub fn ingest_hints(&mut self, fhs: Vec<FullHint>) {
+        let (valid, invalid): (Vec<_>, Vec<_>) = fhs.iter().partition(|&h| h.hint != Hint::Invalid);
+        for fh in valid{
+            self.add_full_hint(fh.clone());
+        }
+        for fh in invalid{
+            self.add_full_hint(fh.clone());
+        }
+
+    }
+
+    pub fn add_full_hint(&mut self, fh: FullHint) {
+        self.add_hint(&fh.c, &fh.p, fh.hint)
+    }
     pub fn add_hint(&mut self, l: &char, p: &usize, h: Hint) {
         match h {
             Hint::WellPlaced => self.add_well_placed(l, p),
@@ -69,101 +116,36 @@ impl Solver {
             Hint::Invalid => self.add_invalid(l),
         }
     }
-    pub fn discard_word(&mut self,s: &str){
+    pub fn discard_word(&mut self, s: &str) {
         self.candidates.remove(s);
     }
 
     fn add_well_placed(&mut self, l: &char, p: &usize) {
-        self.well_placed.push((*l, *p));
-        // Well place means we need to include only in candidate
-        // those with the letter in the right place.
-        self.candidates = self
-            .candidates
-            .intersection(self.with_letter_in_position(l, p))
-            .map(|s| s.clone())
-            .collect()
+        println!("Restricting to words containing an {} at position {}" , l, p);
+        let to_retain = self.with_letter_in_position(l, p).clone();
+        self.candidates.retain(|s| to_retain.contains(s));
+        self.exists_letters.insert(*l);
     }
 
     fn add_exists(&mut self, l: &char, p: &usize) {
-        self.exists.push((*l, *p));
-        // Intersect with the word who just have the character
-        let mut new_candidates: HashSet<String> = self
-            .candidates
-            .intersection(self.with_letter(l))
-            .map(|s| s.clone())
-            .collect();
-        // And REMOVE the words that have this letter in this position
-        // if it was well placed, add_well_placed would be called instead.
-        let to_remove = self.with_letter_in_position(l, p);
-        new_candidates.retain(|s| !to_remove.contains(s));
+        //println!("Restricting to words containing an {}" , l);
 
-        self.candidates = new_candidates;
+        let to_retain = self.with_letter(l).clone();
+        self.candidates.retain(|s| to_retain.contains(s));
+       
+        //println!("Removing words with an {} at position {}" , l, p);
+        let to_remove = self.with_letter_in_position(l, p).clone();
+        self.candidates.retain(|s| !to_remove.contains(s));
+        self.exists_letters.insert(*l);
     }
 
     fn add_invalid(&mut self, l: &char) {
-        self.invalid.push(*l);
-        // Character is invalid. simply remove all the words containing it
-        let to_remove = self.with_letter(l).clone();
-        self.candidates.retain(|s| !to_remove.contains(s));
-    }
-
-    // kept for reference. Remove when it all works.
-    #[deprecated]
-    pub fn refresh_candidates(&mut self) {
-        // intersect of all the well placed ones from by_letter_position
-        // and all the exists ones from by_letter
-        // remove the words from invalid ones.
-        let well_placed: Vec<&HashSet<String>> = self
-            .well_placed
-            .iter()
-            .map(|(l, p)| self.with_letter_in_position(l, p))
-            .collect();
-        let exists: Vec<&HashSet<String>> = self
-            .exists
-            .iter()
-            .map(|(l, _)| self.with_letter(l))
-            .collect();
-        let only_exists_pos: Vec<&HashSet<String>> = self
-            .exists
-            .iter()
-            .map(|(l, p)| self.with_letter_in_position(l, p))
-            .collect();
-        let invalid: Vec<&HashSet<String>> =
-            self.invalid.iter().map(|l| self.with_letter(l)).collect();
-
-        //println!("Exist: {:?}", exists);
-
-        // Start with the exist letter ones as intersection with the original candidates.
-        let mut new_candidates: HashSet<String> =
-            exists.iter().fold(self.candidates.clone(), |a, &e| {
-                a.intersection(e).map(|s| s.clone()).collect()
-            });
-
-        // TODO: Existing ONLY in one position means we need to exclude the words that have
-        // this letter in the given position.
-        new_candidates = only_exists_pos.iter().fold(new_candidates, |mut a, &e| {
-            for invalid in e {
-                a.remove(invalid);
-            }
-            a
-        });
-
-        // then it has to intersect with all the well placed ones too.
-        // println!("Well Placed: {:?}", well_placed);
-        new_candidates = well_placed.iter().fold(new_candidates, |a, &e| {
-            a.intersection(e).map(|s| s.clone()).collect()
-        });
-
-        // Exclude the invalid sets from the new_candidatees
-        new_candidates = invalid.iter().fold(new_candidates, |mut a, &e| {
-            for invalid in e {
-                a.remove(invalid);
-            }
-            a
-        });
-
-        // println!("New candidates: {:?}", new_candidates);
-
-        self.candidates = new_candidates;
+        if self.exists_letters.contains(l) {
+            println!("This letter {} has been hinted as existing already. Not removing it.", l);
+        }else{
+            //println!("Removing words with an {}" , l);
+            let to_remove = self.with_letter(l).clone();
+            self.candidates.retain(|s| !to_remove.contains(s));
+        }
     }
 }

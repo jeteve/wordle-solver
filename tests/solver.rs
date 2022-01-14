@@ -51,6 +51,9 @@ fn solver_hints() {
     solver.add_hint(&'l', &1, Hint::WellPlaced);
     assert_eq!(solver.n_candidates(), 1);
 
+    solver.add_hint(&'l', &1, Hint::Invalid);
+    assert_eq!(solver.n_candidates(), 1); // Buggy invalid hints are ignored. 
+
     // The position does not really matter for an invalid hint
     solver.add_hint(&'s', &0, Hint::Invalid);
     assert_eq!(solver.n_candidates(), 1);
