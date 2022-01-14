@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let stdin = io::stdin(); // We get `Stdin` here.
 
-    while solver.n_candidates() > 1 {
+    while solver.n_candidates() >= 1 {
         let candidate = solver.first_candidate().unwrap().clone();
         println!(
             "Try this: {:?} ({} possibilities left)",
