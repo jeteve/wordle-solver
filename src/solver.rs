@@ -2,16 +2,17 @@ use lazy_static::lazy_static;
 use std::collections::{HashMap, HashSet};
 use std::error;
 use std::fmt;
+use std::cell::RefCell;
 
 lazy_static! {
-    static ref EMPTYSET: HashSet<String> = HashSet::new();
+    static ref EMPTYSET: HashSet<&'static String> = HashSet::new();
 }
 
-pub struct Solver {
-    candidates: HashSet<String>,
-    exists_letters: HashSet<char>,
-    by_letter: HashMap<char, HashSet<String>>,
-    by_letter_position: HashMap<(char, usize), HashSet<String>>,
+pub struct Solver<'a> {
+    candidates: RefCell<HashSet<&'a String>>,
+    exists_letters: RefCell<HashSet<char>>,
+    by_letter: HashMap<char, HashSet<&'a String>>,
+    by_letter_position: HashMap<(char, usize), HashSet<&'a String>>,
 }
 
 #[derive(Clone)]
@@ -51,43 +52,43 @@ impl std::str::FromStr for Hint {
     }
 }
 
-impl Solver {
+impl<'a> Solver<'a> {
     pub fn new(all_words: &HashSet<String>) -> Solver {
-        let candidates = all_words.clone();
-        let by_letter = candidates.iter().fold(HashMap::new(), |mut h, v| {
+        let candidates = all_words.iter().collect::<HashSet<&String>>();
+        let by_letter = all_words.iter().fold(HashMap::new(), |mut h, v| {
             for c in v.chars() {
                 let entry = h.entry(c).or_insert_with(HashSet::new);
-                entry.insert(v.clone());
+                entry.insert(v);
             }
             h
         });
-        let by_letter_position = candidates.iter().fold(HashMap::new(), |mut h, v| {
+        let by_letter_position = all_words.iter().fold(HashMap::new(), |mut h, v| {
             for (p, c) in v.chars().enumerate() {
                 let entry = h.entry((c, p)).or_insert_with(HashSet::new);
-                entry.insert(v.clone());
+                entry.insert(v);
             }
             h
         });
         let exists_letters = HashSet::new();
         Solver {
-            candidates,
-            exists_letters,
+            candidates: RefCell::new(candidates),
+            exists_letters: RefCell::new(exists_letters),
             by_letter,
             by_letter_position,
         }
     }
 
     pub fn n_candidates(&self) -> usize {
-        self.candidates.len()
+        self.candidates.borrow().len()
     }
 
     pub fn first_candidate(&self) -> Option<&String> {
-        return self.candidates.iter().next();
+        return self.candidates.borrow().iter().next().map(|s| *s);
     }
-    pub fn with_letter(&self, l: &char) -> &HashSet<String> {
+    pub fn with_letter(&self, l: &char) -> &HashSet<&String> {
         self.by_letter.get(l).unwrap_or(&EMPTYSET)
     }
-    pub fn with_letter_in_position(&self, l: &char, p: &usize) -> &HashSet<String> {
+    pub fn with_letter_in_position(&self, l: &char, p: &usize) -> &HashSet<&String> {
         self.by_letter_position.get(&(*l, *p)).unwrap_or(&EMPTYSET)
     }
 
@@ -114,36 +115,36 @@ impl Solver {
             Hint::Invalid => self.add_invalid(l),
         }
     }
-    pub fn discard_word(&mut self, s: &str) {
-        self.candidates.remove(s);
+    pub fn discard_word(&self, s: &str) {
+        self.candidates.borrow_mut().remove(&s.to_string());
     }
 
-    fn add_well_placed(&mut self, l: &char, p: &usize) {
+    fn add_well_placed(&self, l: &char, p: &usize) {
         //println!("Restricting to words containing an {} at position {}" , l, p);
         let to_retain = self.with_letter_in_position(l, p).clone();
-        self.candidates.retain(|s| to_retain.contains(s));
-        self.exists_letters.insert(*l);
+        self.candidates.borrow_mut().retain(|s| to_retain.contains(s));
+        self.exists_letters.borrow_mut().insert(*l);
     }
 
-    fn add_exists(&mut self, l: &char, p: &usize) {
+    fn add_exists(&self, l: &char, p: &usize) {
         //println!("Restricting to words containing an {}" , l);
 
         let to_retain = self.with_letter(l).clone();
-        self.candidates.retain(|s| to_retain.contains(s));
+        self.candidates.borrow_mut().retain(|s| to_retain.contains(s));
        
         //println!("Removing words with an {} at position {}" , l, p);
         let to_remove = self.with_letter_in_position(l, p).clone();
-        self.candidates.retain(|s| !to_remove.contains(s));
-        self.exists_letters.insert(*l);
+        self.candidates.borrow_mut().retain(|s| !to_remove.contains(s));
+        self.exists_letters.borrow_mut().insert(*l);
     }
 
-    fn add_invalid(&mut self, l: &char) {
-        if self.exists_letters.contains(l) {
+    fn add_invalid(&self, l: &char) {
+        if self.exists_letters.borrow().contains(l) {
             println!("This letter {} has been hinted as existing already. Not removing it.", l);
         }else{
             //println!("Removing words with an {}" , l);
             let to_remove = self.with_letter(l).clone();
-            self.candidates.retain(|s| !to_remove.contains(s));
+            self.candidates.borrow_mut().retain(|s| !to_remove.contains(s));
         }
     }
 }
