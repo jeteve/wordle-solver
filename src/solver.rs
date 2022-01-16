@@ -83,7 +83,7 @@ impl<'a> Solver<'a> {
     }
 
     pub fn first_candidate(&self) -> Option<&String> {
-        return self.candidates.borrow().iter().next().map(|s| *s);
+        return self.candidates.borrow().iter().next().copied();
     }
     pub fn with_letter(&self, l: &char) -> &HashSet<&String> {
         self.by_letter.get(l).unwrap_or(&EMPTYSET)
