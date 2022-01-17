@@ -6,6 +6,8 @@
 //! See the solver module and the Solver struct
 //! 
 
+pub use solver::*;
+
 pub mod solver;
 
 use assets_manager::{
