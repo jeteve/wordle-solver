@@ -98,6 +98,12 @@ impl<'a> Solver<'a> {
     }
 
     /// The first candidate. Try this in wordle
+    ///
+    /// This is updated after each hint (see `add_hint`), so the more hints
+    /// you give, the more likely this first candidate will win
+    /// the game.
+    ///
+    /// If you give inconsistent hints, this might return `none`.
     pub fn first_candidate(&self) -> Option<&String> {
         return self.candidates.borrow().iter().next().copied();
     }
@@ -112,7 +118,8 @@ impl<'a> Solver<'a> {
     /// Ingests a bunch of Hints together,
     /// ensuring logical consistency between them.
     pub fn ingest_hints(&mut self, fhs: Vec<Hint>) {
-        let (valid, invalid): (Vec<_>, Vec<_>) = fhs.iter().partition(|&h| h.hint != HintType::Invalid);
+        let (valid, invalid): (Vec<_>, Vec<_>) =
+            fhs.iter().partition(|&h| h.hint != HintType::Invalid);
         for fh in valid {
             self.add_hint(fh.clone());
         }
@@ -132,7 +139,11 @@ impl<'a> Solver<'a> {
 
     /// In case you dont want to use the Hint struct
     pub fn add_raw_hint(&mut self, l: &char, p: &usize, h: HintType) {
-       self.add_hint(Hint{hint: h, letter: *l, position: *p})
+        self.add_hint(Hint {
+            hint: h,
+            letter: *l,
+            position: *p,
+        })
     }
 
     /// Some words might be in your dictionary but not
