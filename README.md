@@ -2,8 +2,16 @@
 
 - Install rust https://rustup.rs/
 - Go to https://www.powerlanguage.co.uk/wordle/
-- ```cargo run```
+- `git clone https://github.com/jeteve/wordle-solver.git`
+- `cd wordle-solver`
+- `cargo run`
 - Do what it says.
+
+# About `cargo install`
+
+The included executable will not run with cargo install as it
+needs a file asset to load its dictionary. So until I change
+the packaging, please use `git clone` and `cargo run` to run this.
 
 # Bonus
 

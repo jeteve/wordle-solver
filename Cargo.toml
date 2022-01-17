@@ -1,11 +1,13 @@
 [package]
 name = "wordle-solver"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.56.1"
 description = "A library and a program to solve the daily wordle"
 license = "MIT"
 keywords = ["wordle", "puzzle", "game", "solver"]
+repository = "https://github.com/jeteve/wordle-solver"
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
