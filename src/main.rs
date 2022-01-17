@@ -2,7 +2,7 @@ use assets_manager::AssetCache;
 use std::error::Error;
 use std::io;
 use std::str::FromStr;
-use wordle_solver::solver::{FullHint, Hint, Solver};
+use wordle_solver::solver::{Hint, HintType, Solver};
 
 fn main() -> Result<(), Box<dyn Error>> {
     // load all words from the dictionary, only the ones that are 5 letters
@@ -40,20 +40,24 @@ fn main() -> Result<(), Box<dyn Error>> {
             solver.discard_word(&candidate);
         } else {
             // feedback string IS something. Feed the feedback in the solver.
-            let full_hints: Vec<FullHint> = feedback_str
+            let full_hints: Vec<Hint> = feedback_str
                 .chars()
                 .enumerate()
                 .map(|(i, c)| {
-                    let hint = Hint::from_str(&c.to_string())?;
+                    let hint = HintType::from_str(&c.to_string())?;
                     // And add the hint to the solver.
                     let candidate_char =
                         candidate.chars().nth(i).ok_or("To many feedback letters")?;
                     // Note: Invalid hint can only be about letters that are NOT exists or well placed in the word.
-                    Ok(FullHint { c: candidate_char, p: i, hint })
+                    Ok(Hint {
+                        letter: candidate_char,
+                        position: i,
+                        hint,
+                    })
                     //solver.add_hint(&candidate_char,&i,hint);
                 })
                 //.map(|r: Result<FullHint, Box<dyn Error>>| r.unwrap())
-                .collect::<Result<Vec<FullHint>,Box<dyn Error>>>()?;
+                .collect::<Result<Vec<Hint>, Box<dyn Error>>>()?;
 
             solver.ingest_hints(full_hints);
         }

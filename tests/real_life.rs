@@ -18,19 +18,19 @@ fn real_life() {
     );
     assert_eq!(solver.n_candidates(), 5905);
 
-    solver.add_hint(&'W', &0, Hint::Invalid);
+    solver.add_raw_hint(&'W', &0, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 5429);
 
-    solver.add_hint(&'H', &1, Hint::Invalid);
+    solver.add_raw_hint(&'H', &1, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 4691);
 
-    solver.add_hint(&'I', &2, Hint::Invalid);
+    solver.add_raw_hint(&'I', &2, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 3314);
 
-    solver.add_hint(&'P', &3, Hint::Invalid);
+    solver.add_raw_hint(&'P', &3, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 2797);
 
-    solver.add_hint(&'S', &4, Hint::Invalid);
+    solver.add_raw_hint(&'S', &4, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 1517);
 
     println!(
@@ -39,19 +39,19 @@ fn real_life() {
         solver.n_candidates()
     );
 
-    solver.add_hint(&'A', &0, Hint::WellPlaced);
+    solver.add_raw_hint(&'A', &0, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 144);
 
-    solver.add_hint(&'N', &1, Hint::Invalid);
+    solver.add_raw_hint(&'N', &1, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 96);
 
-    solver.add_hint(&'N', &2, Hint::Invalid);
+    solver.add_raw_hint(&'N', &2, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 96);
 
-    solver.add_hint(&'E', &3, Hint::WellPlaced);
+    solver.add_raw_hint(&'E', &3, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 19);
 
-    solver.add_hint(&'X', &4, Hint::Invalid);
+    solver.add_raw_hint(&'X', &4, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 19);
 
     println!(
@@ -59,19 +59,19 @@ fn real_life() {
         solver.first_candidate(),
         solver.n_candidates()
     );
-    solver.add_hint(&'A', &0, Hint::WellPlaced);
+    solver.add_raw_hint(&'A', &0, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 19); // no move still well placed.
 
-    solver.add_hint(&'R', &1, Hint::Invalid);
+    solver.add_raw_hint(&'R', &1, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 6); // new invalid
 
-    solver.add_hint(&'M', &2, Hint::Invalid);
+    solver.add_raw_hint(&'M', &2, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 6); // new invalid but no change
 
-    solver.add_hint(&'E', &3, Hint::WellPlaced);
+    solver.add_raw_hint(&'E', &3, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 6); // same well placed as before
 
-    solver.add_hint(&'D', &4, Hint::Invalid);
+    solver.add_raw_hint(&'D', &4, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 4); // new invalid
 
     println!(
@@ -80,19 +80,19 @@ fn real_life() {
         solver.n_candidates()
     );
 
-    solver.add_hint(&'A', &0, Hint::WellPlaced);
+    solver.add_raw_hint(&'A', &0, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 4); // existing well placed
 
-    solver.add_hint(&'B', &1, Hint::WellPlaced);
+    solver.add_raw_hint(&'B', &1, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 1); // new well placed
 
-    solver.add_hint(&'B', &2, Hint::WellPlaced);
+    solver.add_raw_hint(&'B', &2, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 1); // new well placed but no move
 
-    solver.add_hint(&'E', &3, Hint::WellPlaced);
+    solver.add_raw_hint(&'E', &3, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 1); // new well placed but no move
 
-    solver.add_hint(&'Y', &4, Hint::WellPlaced);
+    solver.add_raw_hint(&'Y', &4, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 1); // new well placed but no move.
 
     println!(
@@ -106,6 +106,6 @@ fn real_life() {
 
     // Fake Hint, so we can check the number of candidates goes
     // down to zero.
-    solver.add_hint(&'E', &4, Hint::WellPlaced);
+    solver.add_raw_hint(&'E', &4, HintType::WellPlaced);
     assert_eq!(solver.first_candidate(), None);
 }

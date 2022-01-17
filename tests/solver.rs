@@ -1,35 +1,6 @@
-use wordle_solver::solver::{Hint, Solver};
+use wordle_solver::solver::{HintType, Solver};
 
 use std::collections::HashSet;
-
-#[test]
-fn build_solver() {
-    let words: HashSet<String> = vec![String::from("boudin"), String::from("blanc")]
-        .into_iter()
-        .collect();
-    let solver = Solver::new(&words);
-    let llen = |l| solver.with_letter(l).len();
-    let lplen = |l, p| solver.with_letter_in_position(l, p).len();
-
-    assert!(solver.first_candidate().is_some());
-    assert_eq!(llen(&'b'), 2);
-    assert_eq!(llen(&'o'), 1);
-    assert_eq!(llen(&'u'), 1);
-    assert_eq!(llen(&'d'), 1);
-    assert_eq!(llen(&'i'), 1);
-    assert_eq!(llen(&'n'), 2);
-
-    assert_eq!(llen(&'l'), 1);
-    assert_eq!(llen(&'a'), 1);
-    assert_eq!(llen(&'c'), 1);
-    assert_eq!(llen(&'z'), 0);
-
-    assert_eq!(lplen(&'b', &0), 2);
-    assert_eq!(lplen(&'o', &0), 0);
-    assert_eq!(lplen(&'o', &1), 1);
-    assert_eq!(lplen(&'u', &1), 0);
-    assert_eq!(lplen(&'u', &2), 1);
-}
 
 #[test]
 fn solver_hints() {
@@ -45,16 +16,16 @@ fn solver_hints() {
     let mut solver = Solver::new(&words);
     solver.discard_word("carte");
     assert_eq!(solver.n_candidates(), 4);
-    solver.add_hint(&'o', &5, Hint::Exists);
+    solver.add_raw_hint(&'o', &5, HintType::Exists);
     assert_eq!(solver.n_candidates(), 3);
 
-    solver.add_hint(&'l', &1, Hint::WellPlaced);
+    solver.add_raw_hint(&'l', &1, HintType::WellPlaced);
     assert_eq!(solver.n_candidates(), 1);
 
-    solver.add_hint(&'l', &1, Hint::Invalid);
-    assert_eq!(solver.n_candidates(), 1); // Buggy invalid hints are ignored. 
+    solver.add_raw_hint(&'l', &1, HintType::Invalid);
+    assert_eq!(solver.n_candidates(), 1); // Buggy invalid hints are ignored.
 
     // The position does not really matter for an invalid hint
-    solver.add_hint(&'s', &0, Hint::Invalid);
+    solver.add_raw_hint(&'s', &0, HintType::Invalid);
     assert_eq!(solver.n_candidates(), 1);
 }
