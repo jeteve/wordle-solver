@@ -10,6 +10,9 @@
 			"VARIANT": "buster"
 		}
 	},
+	"remoteEnv": {
+		"CARGO_REGISTRY_TOKEN": "${localEnv:CARGO_REGISTRY_TOKEN}"
+	},
 	"runArgs": [
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
