@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.56.1"
 description = "A library and a program to solve the daily wordle"
-licence = "MIT"
+license = "MIT"
 keywords = ["wordle", "puzzle", "game", "solver"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
