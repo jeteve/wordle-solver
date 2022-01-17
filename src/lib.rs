@@ -1,3 +1,11 @@
+//! # wordle_solver
+//! 
+//! Wordle solver is a small library as well as an example utility (`wordle-solver`)
+//! that helps you win the daily wordle ( <https://www.powerlanguage.co.uk/wordle/> )
+//! 
+//! See the solver module and the Solver struct
+//! 
+
 pub mod solver;
 
 use assets_manager::{
