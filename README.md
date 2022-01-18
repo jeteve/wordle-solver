@@ -19,7 +19,7 @@ This seems to also be able to solve https://qntm.org/files/wordle/index.html
 
 # Developing
 
-This is best developed in VS Code, using the provided `.devcontainer`.
+This is best developed in VS Code, using the provided `.devcontainer` with Docker.
 
 # Releasing
 
