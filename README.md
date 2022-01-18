@@ -16,3 +16,11 @@ the packaging, please use `git clone` and `cargo run` to run this.
 # Bonus
 
 This seems to also be able to solve https://qntm.org/files/wordle/index.html
+
+# Developing
+
+This is best developed in VS Code, using the provided `.devcontainer`.
+
+# Releasing
+
+Use `cargo release`
