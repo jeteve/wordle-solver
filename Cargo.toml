@@ -13,6 +13,7 @@ repository = "https://github.com/jeteve/wordle-solver"
 
 [dependencies]
  assets_manager = "0.7.2"
+ itertools = "0.10.3"
  lazy_static = "1.4.0"
  regex = "1.5.4"
 

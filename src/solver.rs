@@ -1,5 +1,6 @@
 use lazy_static::lazy_static;
 //use std::borrow::Borrow;
+use itertools::Itertools;
 use std::cell::RefCell;
 use std::collections::{BTreeSet, HashMap, HashSet};
 use std::error;
@@ -40,7 +41,7 @@ impl PartialEq for ScoredString<'_> {
 }
 impl PartialOrd for ScoredString<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 impl Ord for ScoredString<'_> {
@@ -101,6 +102,14 @@ impl std::str::FromStr for HintType {
     }
 }
 
+fn word_score(w: &str, lf: &HashMap<char, i32>) -> f64 {
+    w.chars()
+        .unique()
+        .flat_map(|c| lf.get(&c))
+        .map(|n| (*n as f64).log10())
+        .sum()
+}
+
 impl<'a> Solver<'a> {
     /// Builds a new Solver
     /// # Example
@@ -113,7 +122,7 @@ impl<'a> Solver<'a> {
     ///  let solver = Solver::new(&dictionary);
     /// ```
     pub fn new(dictionary: &HashSet<String>) -> Solver {
-        let _letter_freq =
+        let letter_freq =
             dictionary
                 .iter()
                 .flat_map(|w| w.chars())
@@ -122,9 +131,11 @@ impl<'a> Solver<'a> {
                     m
                 });
 
+        let score_of = |s| word_score(s, &letter_freq);
+
         let candidates = dictionary
             .iter()
-            .map(|s| ScoredString::new(s, 0.0))
+            .map(|s| ScoredString::new(s, score_of(s)))
             .collect();
 
         let by_letter = dictionary.iter().fold(HashMap::new(), |mut h, v| {
@@ -163,7 +174,10 @@ impl<'a> Solver<'a> {
     ///
     /// If you give inconsistent hints, this might return `none`.
     pub fn first_candidate(&self) -> Option<&String> {
-        return self.candidates.borrow().iter().next().map(|v| v.s);
+        return self.candidates.borrow().iter().rev().next().map(|v| {
+            println!("Candidate {} score: {}", v.s, v.score);
+            v.s
+        });
     }
 
     fn with_letter(&self, l: &char) -> &HashSet<&String> {
