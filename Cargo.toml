@@ -16,4 +16,5 @@ repository = "https://github.com/jeteve/wordle-solver"
  itertools = "0.10.3"
  lazy_static = "1.4.0"
  regex = "1.5.4"
+ clap = { version = "3.0.14" , features = ["derive"]}
 

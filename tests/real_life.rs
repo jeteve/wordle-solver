@@ -7,7 +7,7 @@ use wordle_solver::*;
 fn real_life() {
     let cache = AssetCache::new("assets");
     assert!(cache.is_ok());
-    let words = load_words(&cache.unwrap(), "american-english");
+    let words = load_words(&cache.unwrap(), "american-english", 5);
     assert!(words.is_ok());
     let actual_w = words.unwrap();
     let mut solver = Solver::new(&actual_w);

@@ -5,7 +5,7 @@ use wordle_solver::*;
 fn load_asset() {
     let cache = AssetCache::new("assets");
     assert!(cache.is_ok());
-    let words = load_words(&cache.unwrap(), "american-english");
+    let words = load_words(&cache.unwrap(), "american-english", 5);
     assert!(words.is_ok());
     assert_eq!(words.unwrap().len(), 5905);
 }
