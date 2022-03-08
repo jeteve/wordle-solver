@@ -1,5 +1,6 @@
 version: 2.1
 
+# From https://circleci.com/blog/rust-ci/
 jobs:
   build:
     docker:
