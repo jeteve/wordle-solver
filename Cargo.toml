@@ -12,9 +12,9 @@ repository = "https://github.com/jeteve/wordle-solver"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
- assets_manager = "0.7.2"
+ assets_manager = "0.8.1"
  itertools = "0.10.3"
  lazy_static = "1.4.0"
- regex = "1.5.4"
+ regex = "1.5.6"
  clap = { version = "3.0.14" , features = ["derive"]}
 
